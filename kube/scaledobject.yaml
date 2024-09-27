@@ -1,0 +1,28 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: gameserver
+spec:
+  scaleTargetRef:
+    apiVersion: game.kruise.io/v1alpha1
+    kind: GameServerSet
+    name: gameserver
+  pollingInterval: 5
+  minReplicaCount: 1
+  maxReplicaCount: 100
+  advanced:
+    horizontalPodAutoscalerConfig:
+      behavior:
+        scaleDown:
+          stabilizationWindowSeconds: 0
+          policies:
+            - type: Percent
+              value: 100
+              periodSeconds: 5
+  triggers:
+    - type: prometheus
+      metadata:
+        serverAddress: http://vmsingle-monitoring-victoria-metrics-k8s-stack.monitoring.svc.cluster.local:8429
+        query: |
+          sum(game_room_allocated_total) / sum(game_room_total)
+        threshold: "0.7" # 扩缩容阈值：70% 的房间占用率
