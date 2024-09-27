@@ -2,7 +2,6 @@ apiVersion: game.kruise.io/v1alpha1
 kind: GameServerSet
 metadata:
   name: gameserver
-  namespace: test
 spec:
   replicas: 10
   updateStrategy:
@@ -29,7 +28,7 @@ spec:
             - name: ROOM_TOTAL
               value: "1"
             - name: ALLOCATED_ROOM_RATIO
-              value: "70"
+              value: "50"
             - name: POD_NAME
               valueFrom:
                 fieldRef:
