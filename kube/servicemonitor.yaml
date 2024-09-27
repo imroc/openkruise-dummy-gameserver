@@ -1,0 +1,10 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: gameserver
+spec:
+  selector:
+    matchLabels:
+      game.kruise.io/owner-gss: gameserver
+  endpoints:
+    - port: metrics

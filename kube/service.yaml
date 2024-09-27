@@ -16,4 +16,4 @@ spec:
       protocol: TCP
       targetPort: 8080
   selector:
-    app: gameserver
+    game.kruise.io/owner-gss: gameserver
