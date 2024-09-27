@@ -23,9 +23,11 @@ RUN CGO_ENABLED=0 GOOS=${TARGETOS:-linux} GOARCH=${TARGETARCH:-amd64} go build -
 
 # Use distroless as minimal base image to package the manager binary
 # Refer to https://github.com/GoogleContainerTools/distroless for more details
-FROM gcr.io/distroless/static:nonroot
+FROM alpine:latest
 WORKDIR /
+RUN apk --no-cache add bash curl
 COPY --from=builder /workspace/gameserver .
+COPY check-idle.sh /check-idle.sh
 USER 65532:65532
 
 ENTRYPOINT ["/gameserver"]

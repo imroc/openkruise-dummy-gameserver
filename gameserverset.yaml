@@ -8,6 +8,17 @@ spec:
   updateStrategy:
     rollingUpdate:
       podUpdatePolicy: InPlaceIfPossible
+  serviceQualities:
+    - name: idle
+      containerName: gameserver
+      permanent: false
+      exec:
+        command: ["bash", "/check-idle.sh"]
+      serviceQualityAction:
+        - state: true # 不存在玩家，标记该游戏服运维状态为WaitToBeDeleted
+          opsState: WaitToBeDeleted
+        - state: false # 存在玩家，标记该游戏服运维状态为None
+          opsState: None
   gameServerTemplate:
     spec:
       containers:
