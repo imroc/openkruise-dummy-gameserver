@@ -3,6 +3,7 @@ package main
 import (
 	"math"
 	"math/rand"
+	"net/http"
 	"os"
 	"strconv"
 
@@ -39,7 +40,23 @@ func main() {
 	prom.AddNewRoom(roomTotalNumber)
 	prom.AllocateRoom(allocatedNumber)
 
-	if err := prom.StartServer(promAddr); err != nil {
+	go func() {
+		if err := prom.StartServer(promAddr); err != nil {
+			panic(err)
+		}
+	}()
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/api/idle", func(w http.ResponseWriter, r *http.Request) {
+		if prom.IsAllIdle() {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte("true"))
+		} else {
+			w.WriteHeader(400)
+			w.Write([]byte("false"))
+		}
+	})
+	if err := http.ListenAndServe(":8080", mux); err != nil {
 		panic(err)
 	}
 }

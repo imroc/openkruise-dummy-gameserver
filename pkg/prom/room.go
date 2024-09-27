@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"os"
 
+	dto "github.com/prometheus/client_model/go"
+
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -53,6 +55,18 @@ func ReleaseRoom(n int, reuse bool) {
 		roomTotal.WithLabelValues(podName, podNamespace).Sub(float64(n))
 	}
 	allocatedRoomTotal.WithLabelValues(podName, podNamespace).Sub(float64(n))
+}
+
+func IsAllIdle() bool {
+	metric, err := allocatedRoomTotal.GetMetricWithLabelValues(podName, podNamespace)
+	if err != nil {
+		panic(err)
+	}
+	model := &dto.Metric{}
+	if err := metric.Write(model); err != nil {
+		panic(err)
+	}
+	return *model.Gauge.Value == 0
 }
 
 func StartServer(addr string) error {
