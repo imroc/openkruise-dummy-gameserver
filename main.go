@@ -49,10 +49,8 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/api/idle", func(w http.ResponseWriter, r *http.Request) {
 		if prom.IsAllIdle() {
-			w.WriteHeader(http.StatusOK)
 			w.Write([]byte("true"))
 		} else {
-			w.WriteHeader(400)
 			w.Write([]byte("false"))
 		}
 	})
