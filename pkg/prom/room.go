@@ -57,6 +57,33 @@ func ReleaseRoom(n int, reuse bool) {
 	allocatedRoomTotal.WithLabelValues(podName, podNamespace).Sub(float64(n))
 }
 
+func SetBusy() {
+	currentTotalMetric := &dto.Metric{}
+	currentAllocatedMetric := &dto.Metric{}
+	if err := roomTotal.WithLabelValues(podName, podNamespace).Write(currentTotalMetric); err != nil {
+		panic(err)
+	}
+	if err := allocatedRoomTotal.WithLabelValues(podName, podNamespace).Write(currentAllocatedMetric); err != nil {
+		panic(err)
+	}
+	currentTotal := *currentTotalMetric.Gauge.Value
+	currentAllocated := *currentAllocatedMetric.Gauge.Value
+	if idle := currentTotal - currentAllocated; idle > 0.0 {
+		AllocateRoom(int(idle))
+	}
+}
+
+func SetIdle() {
+	currentAllocatedMetric := &dto.Metric{}
+	if err := allocatedRoomTotal.WithLabelValues(podName, podNamespace).Write(currentAllocatedMetric); err != nil {
+		panic(err)
+	}
+	currentAllocated := *currentAllocatedMetric.Gauge.Value
+	if currentAllocated > 0.0 {
+		ReleaseRoom(int(currentAllocated), true)
+	}
+}
+
 func IsAllIdle() bool {
 	metric, err := allocatedRoomTotal.GetMetricWithLabelValues(podName, podNamespace)
 	if err != nil {

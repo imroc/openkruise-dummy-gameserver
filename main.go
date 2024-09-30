@@ -54,6 +54,12 @@ func main() {
 			w.Write([]byte("false"))
 		}
 	})
+	mux.HandleFunc("/api/set-idle", func(w http.ResponseWriter, r *http.Request) {
+		prom.SetIdle()
+	})
+	mux.HandleFunc("/api/set-busy", func(w http.ResponseWriter, r *http.Request) {
+		prom.SetBusy()
+	})
 	if err := http.ListenAndServe(":8080", mux); err != nil {
 		panic(err)
 	}

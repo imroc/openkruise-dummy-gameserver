@@ -22,6 +22,8 @@ WORKDIR /
 RUN apk --no-cache add bash curl
 COPY --from=builder /workspace/gameserver .
 COPY check-idle.sh /check-idle.sh
+COPY set-idle /set-idle.sh
+COPY set-busy.sh /set-busy.sh
 USER 65532:65532
 
 ENTRYPOINT ["/gameserver"]
