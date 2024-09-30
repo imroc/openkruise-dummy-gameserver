@@ -14,15 +14,15 @@ spec:
     horizontalPodAutoscalerConfig:
       behavior:
         scaleDown:
-          stabilizationWindowSeconds: 0
+          stabilizationWindowSeconds: 120
           policies:
             - type: Percent
-              value: 100
-              periodSeconds: 5
+              value: 10
+              periodSeconds: 120
   triggers:
     - type: prometheus
       metadata:
-        serverAddress: http://vmsingle-monitoring-victoria-metrics-k8s-stack.monitoring.svc.cluster.local:8429
+        serverAddress: http://kube-prometheus-stack-prometheus.monitoring:9090
         query: |
-          sum by (namespace, service) (game_room_allocated_total) / sum by (namespace, service) (game_room_total)
+          count(game_room_allocated_total{namespace="test", service="gameserver"}) * sum(game_room_allocated_total{namespace="test", service="gameserver"}) / sum(game_room_total{namespace="test", service="gameserver"})
         threshold: "0.7" # 扩缩容阈值：70% 的房间占用率
