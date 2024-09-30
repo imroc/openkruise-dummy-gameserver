@@ -4,6 +4,7 @@ metadata:
   name: gameserver
   labels:
     app: gameserver
+    game.kruise.io/owner-gss: gameserver
 spec:
   type: ClusterIP
   ports:
